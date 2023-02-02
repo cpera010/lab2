@@ -1,0 +1,51 @@
+version: '2.2'
+services:
+# DMZ network
+  server:
+    build: ./dmz-server
+    container_name: dmz-server
+    hostname: 'dmz-server'
+
+    networks:
+      DMZ-net:
+        ipv4_address: 172.16.2.10
+
+  dmz-scanner:
+    build: ./scanner
+    container_name: dmz-scanner
+    hostname: 'dmz-scanner'
+
+    networks:
+      DMZ-net:
+        ipv4_address: 172.16.2.20
+
+# Simulated Internet
+  internet-scanner:
+    build: ./scanner
+    container_name: internet-scanner
+    hostname: 'internet-scanner'
+
+    networks:
+      internet:
+        ipv4_address: 172.16.255.20
+       
+networks:
+  DMZ-net:
+    driver: bridge
+    driver_opts:
+      com.docker.network.enable_ipv6: "false"
+    ipam:
+      driver: default
+      config:
+      - subnet: 172.16.2.0/24
+        gateway: 172.16.2.1
+  internet:
+    driver: bridge
+    driver_opts:
+      com.docker.network.enable_ipv6: "false"
+    ipam:
+      driver: default
+      config:
+      - subnet: 172.16.255.0/24
+        gateway: 172.16.255.1
+
